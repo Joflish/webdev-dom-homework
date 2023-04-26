@@ -105,7 +105,9 @@
 
       let currentDate = new Date();
       let currentMonth = Number(currentDate.getMonth() + 1);
-      let currentMinute = currentDate.getMinutes()
+      let currentMinute = currentDate.getMinutes();
+      let currentYear = String(currentDate.getFullYear());
+      currentYear = currentYear.split('').splice(2, 3).join('');
 
       if (currentMonth < 10) {
         currentMonth = "0" + currentMonth;
@@ -115,7 +117,7 @@
         currentMinute = "0" + currentMinute;
       }
 
-      let shownDate = currentDate.getDate() + '.' + currentMonth + '.' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + currentMinute;
+      let shownDate = currentDate.getDate() + '.' + currentMonth + '.' + currentYear + ' ' + currentDate.getHours() + ':' + currentMinute;
 
       const oldListHtml = listElement.innerHTML;
       listElement.innerHTML = oldListHtml + 
