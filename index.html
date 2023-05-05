@@ -1,166 +1,124 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Проект "Комменты"</title>
     <meta charset="utf-8" />
+    <title>Урок "Динамические обработчики событий и всплытие"</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
 
   <body>
-    <div class="container">
-      <ul class="comments" id="comments-users">
-      </ul>
-      <div class="add-form">
+    <h1>Любимые цвета студентов</h1>
+    <ul class="students" id="list">
+      <!-- Список рендерится из JS -->
+    </ul>
+
+    <div class="form">
+      <h3 class="form-title">Форма добавления</h3>
+      <div class="form-row">
+        Имя:&nbsp;&nbsp;
         <input
           type="text"
-          class="add-form-name"
-          placeholder="Введите ваше имя"
           id="name-input"
+          class="input"
+          placeholder="Василий"
         />
-        <textarea
-          type="textarea"
-          class="add-form-text"
-          placeholder="Введите ваш коментарий"
-          rows="4"
-          id="text-input"
-        ></textarea>
-        <div class="add-form-row">
-          <button class="add-form-button" id="button-add">Написать</button>
-        </div>
       </div>
+      <div class="form-row">
+        Цвет:&nbsp;
+        <input type="color" id="color-input" class="color-input input" />
+        <br /><br />
+      </div>
+      <button class="button" id="add-button">Добавить</button>
     </div>
   </body>
-  <style>
-    .error {
-      background-color: red;
-    }
-    .empty {
-      background-color: grey;
-    }
-  </style>
+
   <script>
-    "use strict";
+    const buttonElement = document.getElementById("add-button");
+    const listElement = document.getElementById("list");
+    const nameInputElement = document.getElementById("name-input");
+    const colorInputElement = document.getElementById("color-input");
 
-    const comments = [
+    const students = [
       {
-        name: 'Глеб Фокин',
-        date: '12.02.22 12:18',
-        comment: 'Это будет первый комментарий на этой странице',
-        likes: 2,
+        name: "Глеб",
+        color: "#ff2600"
       },
-
       {
-        name: 'Варвара Н.',
-        date: '13.02.22 19:22',
-        comment: 'Мне нравится как оформлена эта страница! ❤',
-        likes: 75,
+        name: "Иван",
+        color: "#00f900"
       },
+      {
+        name: "Люси",
+        color: "#0432ff"
+      }
     ];
 
-    const listComments = document.getElementById("comments-users");
-    const renderComments = () => {
-      const commentsHTML = comments.map((comments) => {
-        return `<li class="comment">
-        <div class="comment-header">
-          <div>${comments.name}</div>
-          <div>${comments.date}</div>
-        </div>
-        <div class="comment-body">
-            <div class="comment-text">${comments.comment}</div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">${comments.likes}</span>
-              <button class="like-button" data-index="${comments.likes}"></button>
-            </div>
-          </div>
-      </li>`;
-      }
-      ).join('');
-      listComments.innerHTML = commentsHTML;
-    };
+    const renderStudents = () => {
+      const studentsHtml = students
+        .map((student, index) => {
+          return `
+          <li class="student" data-color="${student.color}">
+            <p class="student-name">
+              ${student.name}
+            </p>
+            <button data-index="${index}" class="button delete-button">Удалить</button>
+          </li>`;
+        })
+        .join("");
 
-    function counterLikes() {
-    const likesPress = document.querySelectorAll(".like-button");
-    for (const likePress of likesPress) {
+      listElement.innerHTML = studentsHtml;
+
+      const deleteButtons = document.querySelectorAll(".delete-button");
+
       
-      likePress.addEventListener('click', () => {
-        if (likePress.classList.contains("-active-like") === true) {
-          const counters = likePress.parentNode.getElementsByClassName('likes-counter');
-          if (counters.length == 0) return;
-          counters[0].innerHTML = Number(counters[0].innerHTML) - 1;
-          likePress.classList.remove('-active-like')
+      
+      for (const deleteButton of deleteButtons) {
+        deleteButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const index = deleteButton.dataset.index;
+          console.log(`Удаляем кнопку`);
+          students.splice(index, 1);
+          renderStudents();
+        });
+      }
 
-        } else {
-          likePress.classList.add('-active-like');
-          const counters = likePress.parentNode.getElementsByClassName('likes-counter');
-          if (counters.length == 0) return;
-          counters[0].innerHTML = Number(counters[0].innerHTML) + 1;
+      const studentsElements = document.querySelectorAll(".student");
+      for(const student of studentsElements) {
+        student.addEventListener('click', () => {
+            const color = student.dataset.color;
+            console.log(`Любимый цвет: ${color}`);
+        });
         }
-      });
+
+        document.querySelector("html").addEventListener("click", () => {
+            console.log("Клик по html");
+
+        });
+
     };
-  }
 
-    renderComments();
-    counterLikes();
-
-    const buttonElement = document.getElementById("button-add");
-    const listElement = document.getElementById("comments-users");
-    const nameInputElement = document.getElementById("name-input");
-    const textInputElement = document.getElementById("text-input");
+    renderStudents();
 
     buttonElement.addEventListener("click", () => {
-        nameInputElement.classList.remove('error');
-        textInputElement.classList.remove('error');
+      nameInputElement.classList.remove("input-error");
 
-      if (nameInputElement.value === '' && textInputElement.value === '') {
-        nameInputElement.classList.add('error');
-        textInputElement.classList.add('error');
+      if (nameInputElement.value === "") {
+        nameInputElement.classList.add("input-error");
         return;
       }
 
-      if (nameInputElement.value === '') {
-        nameInputElement.classList.add('error');
-        buttonElement.classList.add('empty');
-        buttonElement.setAttribute('disabled', '');
-        return;
-      }
-
-      if (textInputElement.value === '') {
-        textInputElement.classList.add('error');
-        buttonElement.classList.add('empty');
-        buttonElement.setAttribute('disabled', '');
-        return;
-      }
-
-      let currentDate = new Date();
-      let currentMonth = Number(currentDate.getMonth() + 1);
-      let currentMinute = currentDate.getMinutes();
-      let currentYear = String(currentDate.getFullYear());
-      currentYear = currentYear.split('').splice(2, 3).join('');
-
-      if (currentMonth < 10) {
-        currentMonth = "0" + currentMonth;
-      }
-    
-      if (currentMinute < 10) {
-        currentMinute = "0" + currentMinute;
-      }
-
-      let shownDate = currentDate.getDate() + '.' + currentMonth + '.' + currentYear + ' ' + currentDate.getHours() + ':' + currentMinute;
-
-      comments.push({
+      students.push({
         name: nameInputElement.value,
-        date: shownDate,
-        comment: textInputElement.value,
-        likes: 0,
-      })
+        color: colorInputElement.value
+      });
 
-      renderComments();
+      renderStudents();
 
-      nameInputElement.value = '';
-      textInputElement.value = '';
+      nameInputElement.value = "";
     });
+
     
+
+
   </script>
 </html>
