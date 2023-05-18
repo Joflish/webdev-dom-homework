@@ -135,9 +135,10 @@ getComments();
     .then(responseData => {
       comments = responseData.comments;
       getComments();
+      buttonElement.textContent = "Комментарий загружается";
+      renderComments();
       buttonElement.disabled = false;
       buttonElement.textContent = "Написать";
-      renderComments();
     })
     renderComments();
 
