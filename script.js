@@ -5,13 +5,19 @@ let comments = []
 const listComments = document.getElementById("comments-users");
 
 const getComments = () => {
-  const loader = document.getElementById('loader');
-  loader.innerText = "Документ загружается";
-  fetch("https://webdev-hw-api.vercel.app/api/v1/alexei-rybak/comments", 
-  {
+  // Создаем сообщение и устанавливаем стили
+  const message = document.createElement("div");
+  message.textContent = "Документ загружается";
+  message.style.color = "white";
+  document.body.appendChild(message);
+
+  fetch("https://webdev-hw-api.vercel.app/api/v1/alexei-rybak/comments", {
     method: "GET",
-  }).then((response) => {
-    response.json().then((responseData) => {
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((responseData) => {
       const appComments = responseData.comments.map((comment) => {
         return {
           name: comment.author.name,
@@ -23,9 +29,12 @@ const getComments = () => {
       });
 
       comments = appComments;
-      renderComments();
+      // Убираем сообщение спустя 1 секунду после загрузки данных
+      setTimeout(() => {
+        message.remove();
+        renderComments();
+      }, 1000);
     });
-  });
 };
 
 getComments();
