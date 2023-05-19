@@ -5,9 +5,9 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" href="styles.css" />
   </head>
-
   <body>
-    <div class="container" id="loader">
+    <div id="loader" class="load">Данные загружаются</div>
+    <div class="container">
       <ul class="comments" id="comments-users">
       </ul>
       <div class="add-form-row">
@@ -29,6 +29,9 @@
         ></textarea>
         <div class="add-form-row">
           <button class="add-form-button" id="button-add">Написать</button>
+        </div>
+        <div class="form-loading" style="display: none; margin-top: 20px;">
+          Комментарий добавляется
         </div>
       </div>
     </div>
