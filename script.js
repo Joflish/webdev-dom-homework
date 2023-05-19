@@ -5,11 +5,6 @@ let comments = []
 const listComments = document.getElementById("comments-users");
 
 const getComments = () => {
-  // Создаем сообщение и устанавливаем стили
-  const message = document.createElement("div");
-  message.textContent = "Документ загружается";
-  message.style.color = "white";
-  document.body.appendChild(message);
 
   fetch("https://webdev-hw-api.vercel.app/api/v1/alexei-rybak/comments", {
     method: "GET",
@@ -29,11 +24,9 @@ const getComments = () => {
       });
 
       comments = appComments;
-      // Убираем сообщение спустя 1 секунду после загрузки данных
-      setTimeout(() => {
-        message.remove();
-        renderComments();
-      }, 1000);
+
+      renderComments();
+
     });
 };
 
@@ -134,11 +127,11 @@ getComments();
     .then(response => response.json())
     .then(responseData => {
       comments = responseData.comments;
-      getComments();
       buttonElement.textContent = "Комментарий загружается";
-      renderComments();
+      getComments();
       buttonElement.disabled = false;
       buttonElement.textContent = "Написать";
+      renderComments(); 
     })
     renderComments();
 
