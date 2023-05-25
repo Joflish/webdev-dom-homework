@@ -124,7 +124,7 @@ const addComment = () => {
   body: JSON.stringify({
     name: nameInputElement.value,
     text: textInputElement.value,
-    forceError: true,
+    // forceError: true,
     }),
   })
   .then((response) => {
