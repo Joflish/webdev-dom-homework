@@ -122,53 +122,62 @@ const addComment = () => {
   fetch("https://webdev-hw-api.vercel.app/api/v1/alexei-rybak/comments", {
   method: "POST",
   body: JSON.stringify({
-    name: nameInputElement.value,
-    text: textInputElement.value,
-    // forceError: true,
+    name: nameInputElement.value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;"),
+    text: textInputElement.value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;"),
     }),
   })
+  .catch(() =>{
+    buttonElement.textContent = "Написать";
+    alert('Кажется, у вас сломался интернет, попробуйте позже');
+    document.getElementById("name-input").disabled = true; // Скрываем для сохранения введенного имени
+    document.getElementById("text-input").disabled = true; // Скрываем для сохранения введенного текста комментария
+    buttonElement.disabled = false;
+    })
   .then((response) => {
-    if (response.status === 400) {
-        throw new Error('Поля должны быть не короче 3-х символов');
-    } else if (response.status === 500) {
-      document.getElementById("name-input").disabled = true; // Скрываем для сохранения введенного имени
-      document.getElementById("text-input").disabled = true; // Скрываем для сохранения введенного текста комментария
-      throw new Error('Сервер сломался, попробуйте позже');
-    } else {
-      return response.json();
-    }
-  })
-  .then(responseData => {
-    comments = responseData.comments;
+     if(response.status === 201) {
+     return response.json();
+     } 
+     if(response.status === 500) {
+     document.getElementById("name-input").disabled = true; // Скрываем для сохранения введенного имени
+     document.getElementById("text-input").disabled = true; // Скрываем для сохранения введенного текста комментария 
+     return Promise.reject(500);
+     }
+     if(response.status === 400) {
+     return Promise.reject(400);
+     }
+    })
+  .then(() => {
+    getComments();
   })
   .then(() => {
-    return getComments();
-  })
-  .then (() => {
-    buttonElement.disabled = false;
-    buttonElement.textContent = "Написать";
-    nameInputElement.value = '';
+    nameInputElement.value = ''; 
     textInputElement.value = '';
+    buttonElement.classList.add("empty");
   })
   .catch((error) => {
-    console.log("Error message =", error.message)
-    buttonElement.disabled = false;
-    buttonElement.textContent = "Написать";
-    addButtonElement.classList.remove("empty");
-
-    if (nameInputElement.value.length < 3 || textInputElement.value.length < 3) {
-      alert("Имя и комментарий должны быть не короче 3-х символов");
-      document.getElementById("name-input").disabled = false;
-      document.getElementById("text-input").disabled = false;
-    } else {
-      alert("Кажется, у вас сломался интернет, попробуйте позже");
+    if(error === 500) {
+      alert('Сервер сломался, попробуйте позже');
     }
+     if(error === 400) {
+      buttonElement.classList.add("empty");
+      alert('Имя и комментарий должны быть не короче 3 символов');
+    } 
   })
+  .then(() => {
+    buttonElement.textContent = 'Написать';
+    //buttonElement.classList.remove("empty");
+  });
 
   renderComments();
 
-  addButtonElement.disabled = true;
-  addButtonElement.classList.add("empty");
 };
 
 buttonElement.addEventListener("click", addComment);
