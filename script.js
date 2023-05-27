@@ -1,14 +1,14 @@
-"use strict";
+'use strict';
 
-let comments = []
+let comments = [];
 
-const listComments = document.getElementById("comments-users");
+const listComments = document.getElementById('comments-users');
 
 const getComments = () => {
-  document.getElementById("loader").style.display = "block";
+  document.getElementById('loader').style.display = 'block';
 
-  fetch("https://webdev-hw-api.vercel.app/api/v1/alexei-rybak/comments", {
-    method: "GET",
+  fetch('https://webdev-hw-api.vercel.app/api/v1/alexei-rybak/comments', {
+    method: 'GET',
   })
     .then((response) => {
       return response.json();
@@ -26,16 +26,16 @@ const getComments = () => {
 
       comments = appComments;
       renderComments();
-      document.getElementById("loader").style.display = "none";
+      document.getElementById('loader').style.display = 'none';
     });
 };
 
 getComments();
 
 const renderComments = () => {
-
-  const commentsHTML = comments.map((comment, index) => {
-    const formattedDate = formatDate(new Date(comment.date));
+  const commentsHTML = comments
+    .map((comment, index) => {
+      const formattedDate = formatDate(new Date(comment.date));
       return `<li data-index="${index}" class="comment">
         <div class="comment-header">
           <div>${comment.name}</div>
@@ -47,11 +47,14 @@ const renderComments = () => {
         <div class="comment-footer">
           <div class="likes">
             <span class="likes-counter">${comment.likes}</span>
-            <button data-index="${index}" class="like-button ${comment.isLiked ? "-active-like" : ""}"></button>
+            <button data-index="${index}" class="like-button ${
+        comment.isLiked ? '-active-like' : ''
+      }"></button>
           </div>
         </div>
       </li>`;
-    }).join('');
+    })
+    .join('');
 
   listComments.innerHTML = commentsHTML;
   counterLikes();
@@ -76,30 +79,30 @@ function counterLikes() {
     likesButtonElement.addEventListener('click', (event) => {
       event.stopPropagation();
       const index = likesButtonElement.dataset.index;
-      const comment = comments[index];         
+      const comment = comments[index];
 
       if (comment.isLiked) {
         comment.likes = comment.likes - 1;
-      likesButtonElement.classList.remove('-active-like');
+        likesButtonElement.classList.remove('-active-like');
       } else {
         comment.likes = comment.likes + 1;
-      likesButtonElement.classList.add('-active-like');
+        likesButtonElement.classList.add('-active-like');
       }
 
       comment.isLiked = !comment.isLiked;
-          
+
       renderComments();
     });
-  })
-};
-  
+  });
+}
+
 function answerComment() {
-  const oldComments = document.querySelectorAll(".comment");
+  const oldComments = document.querySelectorAll('.comment');
 
   for (let oldComment of oldComments) {
-    oldComment.addEventListener("click", (event) => {
+    oldComment.addEventListener('click', (event) => {
       event.stopPropagation();
-        
+
       const index = oldComment.dataset.index;
       const comment = comments[index];
 
@@ -108,109 +111,99 @@ function answerComment() {
   }
 }
 
-const buttonElement = document.getElementById("button-add");
-const listElement = document.getElementById("comments-users");
-const nameInputElement = document.getElementById("name-input");
-const textInputElement = document.getElementById("text-input");
+const buttonElement = document.getElementById('button-add');
+const listElement = document.getElementById('comments-users');
+const nameInputElement = document.getElementById('name-input');
+const textInputElement = document.getElementById('text-input');
 
 const addComment = () => {
   buttonElement.disabled = true;
-  buttonElement.textContent = "Комментарий добавляется...";
-  document.getElementById("name-input").disabled = false;
-  document.getElementById("text-input").disabled = false;
+  buttonElement.textContent = 'Комментарий добавляется...';
+  document.getElementById('name-input').disabled = false;
+  document.getElementById('text-input').disabled = false;
 
-  fetch("https://webdev-hw-api.vercel.app/api/v1/alexei-rybak/comments", {
-  method: "POST",
-  body: JSON.stringify({
-    name: nameInputElement.value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;"),
-    text: textInputElement.value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;"),
+  fetch('https://webdev-hw-api.vercel.app/api/v1/alexei-rybak/comments', {
+    method: 'POST',
+    body: JSON.stringify({
+      name: nameInputElement.value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;'),
+      text: textInputElement.value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;'),
+      forceError: true,
     }),
   })
-  .catch(() =>{
-    buttonElement.textContent = "Написать";
-    alert('Кажется, у вас сломался интернет, попробуйте позже');
-    document.getElementById("name-input").disabled = true; // Скрываем для сохранения введенного имени
-    document.getElementById("text-input").disabled = true; // Скрываем для сохранения введенного текста комментария
-    buttonElement.disabled = false;
+    .then((response) => {
+      buttonElement.textContent = 'Написать';
+      buttonElement.disabled = false;
+      if (response.status === 500) {
+        return Promise.reject(500);
+      }
+      if (response.status === 400) {
+        return Promise.reject(400);
+      }
     })
-  .then((response) => {
-     if(response.status === 201) {
-     return response.json();
-     } 
-     if(response.status === 500) {
-     document.getElementById("name-input").disabled = true; // Скрываем для сохранения введенного имени
-     document.getElementById("text-input").disabled = true; // Скрываем для сохранения введенного текста комментария 
-     return Promise.reject(500);
-     }
-     if(response.status === 400) {
-     return Promise.reject(400);
-     }
+    .then(() => {
+      getComments();
     })
-  .then(() => {
-    getComments();
-  })
-  .then(() => {
-    nameInputElement.value = ''; 
-    textInputElement.value = '';
-    buttonElement.classList.add("empty");
-  })
-  .catch((error) => {
-    if(error === 500) {
-      alert('Сервер сломался, попробуйте позже');
-    }
-     if(error === 400) {
-      buttonElement.classList.add("empty");
-      alert('Имя и комментарий должны быть не короче 3 символов');
-    } 
-  })
-  .then(() => {
-    buttonElement.textContent = 'Написать';
-    //buttonElement.classList.remove("empty");
-  });
+    .then(() => {
+      nameInputElement.value = '';
+      textInputElement.value = '';
+      buttonElement.classList.add('empty');
+    })
+    .catch((error) => {
+      if (error === 500) {
+        alert('Сервер сломался, попробуйте позже');
+        return;
+      }
+      if (error === 400) {
+        buttonElement.classList.add('empty');
+        alert('Имя и комментарий должны быть не короче 3 символов');
+        return;
+      }
+
+      alert('Кажется, у вас сломался интернет');
+    });
 
   renderComments();
-
 };
 
-buttonElement.addEventListener("click", addComment);
+buttonElement.addEventListener('click', addComment);
 
 const deleteComment = () => {
   comments.pop();
   renderComments();
-}
+};
 
-textInputElement.addEventListener("keypress", (event) => {
-  if (event.key === "Enter") {
+textInputElement.addEventListener('keypress', (event) => {
+  if (event.key === 'Enter') {
     addComment();
     event.preventDefault();
   }
 });
-  
-const buttonDeleteElement = document.getElementById("button-delete");
-  
-buttonDeleteElement.addEventListener("click", deleteComment);
 
-const addButtonElement = document.getElementById("button-add");
-  
+const buttonDeleteElement = document.getElementById('button-delete');
+
+buttonDeleteElement.addEventListener('click', deleteComment);
+
+const addButtonElement = document.getElementById('button-add');
+
 addButtonElement.disabled = true;
-addButtonElement.classList.add("empty"); 
-nameInputElement.addEventListener("input", handleInput);
-textInputElement.addEventListener("input", handleInput);
+addButtonElement.classList.add('empty');
+nameInputElement.addEventListener('input', handleInput);
+textInputElement.addEventListener('input', handleInput);
 
 function handleInput() {
-  if (nameInputElement.value.trim() !== "" && textInputElement.value.trim() !== "") {
+  if (nameInputElement.value.trim() !== '' && textInputElement.value.trim() !== '') {
     addButtonElement.disabled = false;
-    addButtonElement.classList.remove("empty"); 
+    addButtonElement.classList.remove('empty');
   } else {
     addButtonElement.disabled = true;
-    addButtonElement.classList.add("empty");
+    addButtonElement.classList.add('empty');
   }
 }
