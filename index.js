@@ -4,7 +4,7 @@ import { getComments, addComments } from "./api.js";
 import { renderLogin } from "./login-components.js";
 
 let comments = [];
-let token = "Bearer asb4c4boc86gasb4c4boc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4k";
+let token = '';
 
 token = null;
 
@@ -86,7 +86,7 @@ const renderApp = () => {
 
   const newComment = () => {
 
-    addComments = () => ({
+    addComments ({
       token,
       name: inputNameElement.value,
       text: textareaElement.value,
@@ -145,10 +145,10 @@ function counterLikes() {
       const comment = comments[index];
 
       if (comment.isLiked) {
-        comment.likes = comment.likes - 1;
+        comment.likes--;
         likesButtonElement.classList.remove('-active-like');
       } else {
-        comment.likes = comment.likes + 1;
+        comment.likes++;
         likesButtonElement.classList.add('-active-like');
       }
 
