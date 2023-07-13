@@ -4,7 +4,7 @@ let comments = []
 
 const getComments = () => {
 
-  const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/alexei-rybak/comments", 
+  const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/pyaterikov-matvei/comments", 
   {
     method: "GET",
   });
@@ -103,7 +103,7 @@ getComments();
         const index = oldComment.dataset.index;
         const comment = comments[index];
 
-        textInputElement.value = `QUOTE_BEGIN ${comment.text}\n${comment.name} QUOTE_END`;
+        textInputElement.value = `${comment.text}\n${comment.name}`;
       });
     }
   }
@@ -115,7 +115,7 @@ getComments();
 
   const addComment = () => {
 
-    const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/alexei-rybak/comments", {
+    const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/pyaterikov-matvei/comments", {
       method: "POST",
       body: JSON.stringify({
         name: nameInputElement.value,
